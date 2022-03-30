@@ -132,9 +132,6 @@ dmypy.json
 # Vscode
 .vscode/
 
-# Datasets
-**/data/
-
 # Model weights
 *.pt
 
