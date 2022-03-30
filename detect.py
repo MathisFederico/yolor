@@ -61,7 +61,7 @@ def detect(save_img=False):
 
     # Load model
     model = Darknet(cfg, imgsz)
-    if device == "cpu":
+    if device != "cpu":
         model = model.cuda()
 
     model.load_state_dict(torch.load(weights[0], map_location=device)["model"])
