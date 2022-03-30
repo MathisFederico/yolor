@@ -137,3 +137,6 @@ dmypy.json
 
 # Model weights
 *.pt
+
+# Runs data
+runs/
