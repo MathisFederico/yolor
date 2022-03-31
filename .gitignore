@@ -128,7 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-
 # Vscode
 .vscode/
 
@@ -137,3 +136,4 @@ dmypy.json
 
 # Runs data
 runs/
+wandb/
