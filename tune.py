@@ -303,6 +303,13 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
             # Print
             if rank in [-1, 0]:
                 mloss = (mloss * i + loss_items) / (i + 1)  # update mean losses
+                if wandb and ni > 32:
+                    wandb.log({
+                        'loss_box':mloss[0].cpu().numpy(),
+                        'loss_obj':mloss[1].cpu().numpy(),
+                        'loss_cls':mloss[2].cpu().numpy(),
+                        'loss':mloss[3].cpu().numpy(),
+                    })
                 mem = '%.3gG' % (torch.cuda.memory_reserved() / 1E9 if torch.cuda.is_available() else 0)  # (GB)
                 s = ('%10s' * 2 + '%10.4g' * 6) % (
                     '%g/%g' % (epoch, epochs - 1), mem, *mloss, targets.shape[0], imgs.shape[-1])
@@ -332,8 +339,7 @@ def train(hyp, opt, device, tb_writer=None, wandb=None):
                 ema.update_attr(model)
             final_epoch = epoch + 1 == epochs
             if not opt.notest or final_epoch:  # Calculate mAP
-                if epoch >= 3:
-                    results, maps, times = test.test(opt.data,
+                results, maps, times = test.test(opt.data,
                                                  batch_size=batch_size*2,
                                                  imgsz=imgsz_test,
                                                  model=ema.ema.module if hasattr(ema.ema, 'module') else ema.ema,
