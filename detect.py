@@ -142,7 +142,7 @@ def detect(save_img=False):
                 # Print results
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()  # detections per class
-                    s += "%g %ss, " % (n, names[int(c)])  # add to string
+                    s += "%g %ss, " % (n, names[min(len(names)-1, int(c))])  # add to string
 
                 # Write results
                 for *xyxy, conf, cls in det:
@@ -156,6 +156,7 @@ def detect(save_img=False):
                             f.write(("%g " * 5 + "\n") % (cls, *xywh))  # label format
 
                     if save_img or view_img:  # Add bbox to image
+                        cls = min(len(names) - 1, cls)
                         label = "%s %.2f" % (names[int(cls)], conf)
                         plot_one_box(
                             xyxy,
@@ -166,7 +167,7 @@ def detect(save_img=False):
                         )
 
             # Print time (inference + NMS)
-            print("%sDone. (%.3fs)" % (s, t2 - t1))
+            print("%sDone. (%.2fms - %.0iFPS)" % (s, (t2 - t1)*1e3, 1/(t2 - t1)))
 
             # Stream results
             if view_img:
