@@ -97,6 +97,7 @@ def detect(save_img=False):
     t0 = time.time()
     img = torch.zeros((1, 3, imgsz, imgsz), device=device)  # init img
     _ = model(img.half() if half else img) if device.type != "cpu" else None  # run once
+    last_print_t0 = time.time()
     for path, img, im0s, vid_cap in dataset:
         img = torch.from_numpy(img).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
@@ -163,12 +164,16 @@ def detect(save_img=False):
                             im0,
                             label=label,
                             color=colors[int(cls)],
-                            line_thickness=3,
+                            line_thickness=1,
                         )
 
             # Print time (inference + NMS)
-            print("%sDone. (%.2fms - %.0iFPS)" % (s, (t2 - t1)*1e3, 1/(t2 - t1)))
-
+            if time.time() - last_print_t0 > 0.2:
+                if hasattr(dataset, 'nf'):
+                    print('Image %g/%g %s: ' % (dataset.count, dataset.nf, '\\'.join(path.split('\\')[-2:])), end='')
+                print("%sDone. (%.2fms - %.0iFPS)" % (s, (t2 - t1)*1e3, 1/(t2 - t1)))
+                last_print_t0 = time.time()
+ 
             # Stream results
             if view_img:
                 cv2.imshow(p, im0)
