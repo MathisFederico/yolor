@@ -46,7 +46,7 @@ def detect(save_img=False):
         opt.names,
     )
     webcam = (
-        source == "0"
+        source.isnumeric()
         or source.startswith("rtsp")
         or source.startswith("http")
         or source.endswith(".txt")
@@ -143,7 +143,10 @@ def detect(save_img=False):
                 # Print results
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()  # detections per class
-                    s += "%g %ss, " % (n, names[min(len(names)-1, int(c))])  # add to string
+                    s += "%g %ss, " % (
+                        n,
+                        names[min(len(names) - 1, int(c))],
+                    )  # add to string
 
                 # Write results
                 for *xyxy, conf, cls in det:
@@ -169,11 +172,17 @@ def detect(save_img=False):
 
             # Print time (inference + NMS)
             if time.time() - last_print_t0 > 0.2:
-                if hasattr(dataset, 'nf'):
-                    print('Image %g/%g %s: ' % (dataset.count, dataset.nf, '\\'.join(path.split('\\')[-2:])), end='')
-                print("%sDone. (%.2fms - %.0iFPS)" % (s, (t2 - t1)*1e3, 1/(t2 - t1)))
+                if hasattr(dataset, "nf"):
+                    print(
+                        "Image %g/%g %s: "
+                        % (dataset.count, dataset.nf, "\\".join(path.split("\\")[-2:])),
+                        end="",
+                    )
+                print(
+                    "%sDone. (%.2fms - %.0iFPS)" % (s, (t2 - t1) * 1e3, 1 / (t2 - t1))
+                )
                 last_print_t0 = time.time()
- 
+
             # Stream results
             if view_img:
                 cv2.imshow(p, im0)
